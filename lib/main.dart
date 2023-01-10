@@ -26,13 +26,22 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: Colors.black87,
-          selectedLabelStyle: TextStyle(fontSize: 12),
-        )
-      ),
+          primarySwatch: Colors.blue,
+          appBarTheme: AppBarTheme(
+            backgroundColor: Colors.white,
+            foregroundColor: Colors.black,
+            iconTheme: IconThemeData(
+              color: Colors.black87,
+            ),
+            toolbarTextStyle: TextStyle(
+              color: Colors.black,
+            ),
+          ),
+          bottomNavigationBarTheme: BottomNavigationBarThemeData(
+            type: BottomNavigationBarType.fixed,
+            selectedItemColor: Colors.black87,
+            selectedLabelStyle: TextStyle(fontSize: 12),
+          )),
       home: const NavigatorHomeScreen(),
     );
   }
