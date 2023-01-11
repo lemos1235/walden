@@ -96,9 +96,19 @@ class _WeekBarState extends State<WeekBar> {
             color: Color(0x675EAFCC),
             height: 48,
           ),
+          // calendar indicator
           Expanded(
-            child: Container(
-              color: Colors.white,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                  width: 30,
+                  height: 5,
+                  decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.all(Radius.circular(12.0))),
+                ),
+              ],
             ),
           ),
         ],
