@@ -3,6 +3,8 @@
 // [Date] 2023/1/10
 //
 import 'package:flutter/material.dart';
+import 'package:walden/widgets/sliding_panel.dart';
+import 'package:walden/widgets/sliver_header.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,19 +19,50 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: buildAppBar(),
-      body: Text("hello"),
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 183.0),
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                Container(
+                  alignment: Alignment.center,
+                  height: 500,
+                  color: Colors.orange,
+                  child: Text("1500"),
+                ),
+              ],
+            ),
+          ),
+          Material(
+            elevation: 2,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                buildAppBar(),
+                WeekBar(),
+                SlidingPanel(
+                  builder: (BuildContext context, AnimationController ac) {
+                    return Container(color: Colors.blue, child: Text("calendar"));
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  AppBar buildAppBar() {
+  Widget buildAppBar() {
     var mediaQuery = MediaQuery.of(context);
     final statusBarHeight = mediaQuery.padding.top;
-
     final appBarLeading = Row(
       children: [
         SizedBox(width: 12),
         Column(
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Text(
               "周二，10",
@@ -43,76 +76,53 @@ class _HomePageState extends State<HomePage> {
         ),
       ],
     );
-    return AppBar(
-      toolbarHeight: 50,
-      leadingWidth: 100,
-      leading: appBarLeading,
-      actions: [
-        Icon(Icons.settings),
-        SizedBox(width: statusBarHeight / 2),
-      ],
-      bottom: WeekBar(),
-    );
-  }
-
-}
-
-class WeekBar extends StatefulWidget implements PreferredSizeWidget {
-  const WeekBar({super.key});
-
-  @override
-  State<WeekBar> createState() => _WeekBarState();
-
-  @override
-  Size get preferredSize => Size.fromHeight(120);
-}
-
-class _WeekBarState extends State<WeekBar> {
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: widget.preferredSize.height,
-      child: Column(
+    return Padding(
+      padding: EdgeInsets.only(top: statusBarHeight),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          appBarLeading,
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: DefaultTextStyle(
-              style: TextStyle(color: Colors.black45),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text("日"),
-                  Text("一"),
-                  Text("二"),
-                  Text("三"),
-                  Text("四"),
-                  Text("五"),
-                  Text("六"),
-                ],
-              ),
-            ),
-          ),
-          Container(
-            color: Color(0x675EAFCC),
-            height: 48,
-          ),
-          // calendar indicator
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  width: 30,
-                  height: 5,
-                  decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.all(Radius.circular(12.0))),
-                ),
-              ],
-            ),
+            padding: EdgeInsets.only(right: statusBarHeight / 2),
+            child: Icon(Icons.settings),
           ),
         ],
       ),
+    );
+  }
+}
+
+class WeekBar extends StatelessWidget {
+  const WeekBar({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: DefaultTextStyle(
+            style: TextStyle(color: Colors.black45),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text("日"),
+                Text("一"),
+                Text("二"),
+                Text("三"),
+                Text("四"),
+                Text("五"),
+                Text("六"),
+              ],
+            ),
+          ),
+        ),
+        Container(
+          color: Color(0x675EAFCC),
+          height: 48,
+        ),
+      ],
     );
   }
 }
