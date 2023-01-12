@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:walden/pages/goal_page.dart';
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
     ));
     return MaterialApp(
       title: 'Flutter Demo',
+      scrollBehavior: CupertinoScrollBehavior(),
       theme: ThemeData(
           primarySwatch: Colors.blue,
           appBarTheme: AppBarTheme(

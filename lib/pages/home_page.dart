@@ -41,12 +41,7 @@ class _HomePageState extends State<HomePage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 buildAppBar(),
-                WeekBar(),
-                SlidingPanel(
-                  builder: (BuildContext context, AnimationController ac) {
-                    return Container(color: Colors.blue, child: Text("calendar"));
-                  },
-                ),
+                CalendarBar(),
               ],
             ),
           ),
@@ -92,8 +87,8 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class WeekBar extends StatelessWidget {
-  const WeekBar({Key? key}) : super(key: key);
+class CalendarBar extends StatelessWidget {
+  const CalendarBar({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -121,6 +116,11 @@ class WeekBar extends StatelessWidget {
         Container(
           color: Color(0x675EAFCC),
           height: 48,
+        ),
+        SlidingPanel(
+          builder: (BuildContext context, AnimationController ac) {
+            return Container(color: Colors.blue, child: Text("calendar"));
+          },
         ),
       ],
     );

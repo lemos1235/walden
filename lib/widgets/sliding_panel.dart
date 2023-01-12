@@ -27,12 +27,10 @@ class SlidingPanel extends StatefulWidget {
 class _SlidingPanelState extends State<SlidingPanel> with SingleTickerProviderStateMixin {
   late AnimationController _ac;
 
-  final VelocityTracker _vt = VelocityTracker.withKind(PointerDeviceKind.touch);
-
   @override
   void initState() {
     super.initState();
-    _ac = AnimationController(vsync: this);
+    _ac = AnimationController(vsync: this, duration: Duration(milliseconds: 500));
   }
 
   @override
@@ -43,13 +41,13 @@ class _SlidingPanelState extends State<SlidingPanel> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    return Listener(
-      onPointerDown: (PointerDownEvent p) => _vt.addPosition(p.timeStamp, p.position),
-      onPointerMove: (PointerMoveEvent p) {
-        _vt.addPosition(p.timeStamp, p.position);
-        _onGestureSlide(p.delta.dy);
+    return GestureDetector(
+      onPanUpdate: (details) {
+        _onGestureSlide(details.delta.dy);
       },
-      onPointerUp: (PointerUpEvent p) => _onGestureEnd(_vt.getVelocity()),
+      onPanEnd: (details) {
+        _onGestureEnd(details.velocity);
+      },
       child: AnimatedBuilder(
         animation: _ac,
         builder: (BuildContext context, Widget? child) {
@@ -104,22 +102,27 @@ class _SlidingPanelState extends State<SlidingPanel> with SingleTickerProviderSt
   }
 
   Widget _buildSlideIndicator() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      color: Colors.red,
-      width: double.infinity,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Container(
-            width: 30,
-            height: 5,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.all(Radius.circular(12.0)),
+    return GestureDetector(
+      onTap: () {
+        _ac.fling(velocity: 1 - 2 * _ac.value);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        color: Colors.red,
+        width: double.infinity,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              width: 30,
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.all(Radius.circular(12.0)),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
