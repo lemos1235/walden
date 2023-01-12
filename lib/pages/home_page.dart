@@ -3,8 +3,7 @@
 // [Date] 2023/1/10
 //
 import 'package:flutter/material.dart';
-import 'package:walden/widgets/sliding_panel.dart';
-import 'package:walden/widgets/sliver_header.dart';
+import 'package:walden/widgets/calendar/calendar_bar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -83,46 +82,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-    );
-  }
-}
-
-class CalendarBar extends StatelessWidget {
-  const CalendarBar({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: DefaultTextStyle(
-            style: TextStyle(color: Colors.black45),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text("日"),
-                Text("一"),
-                Text("二"),
-                Text("三"),
-                Text("四"),
-                Text("五"),
-                Text("六"),
-              ],
-            ),
-          ),
-        ),
-        Container(
-          color: Color(0x675EAFCC),
-          height: 48,
-        ),
-        SlidingPanel(
-          builder: (BuildContext context, AnimationController ac) {
-            return Container(color: Colors.blue, child: Text("calendar"));
-          },
-        ),
-      ],
     );
   }
 }

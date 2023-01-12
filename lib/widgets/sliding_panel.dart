@@ -8,13 +8,14 @@ import 'package:flutter/material.dart';
 typedef SlidingBodyBuilder = Widget Function(BuildContext context, AnimationController controller);
 
 class SlidingPanel extends StatefulWidget {
-  const SlidingPanel({Key? key, required this.builder}) : super(key: key);
+  const SlidingPanel({Key? key, this.maxHeight = 200, this.minHeight = 0, required this.builder})
+      : super(key: key);
 
   final SlidingBodyBuilder builder;
 
-  final double maxHeight = 200;
+  final double maxHeight;
 
-  final double minHeight = 0;
+  final double minHeight;
 
   final double indicatorHeight = 26;
 
@@ -54,20 +55,20 @@ class _SlidingPanelState extends State<SlidingPanel> with SingleTickerProviderSt
           return Container(
             height:
                 (widget.maxHeight - widget.minHeight) * _ac.value + widget.minHeight + widget.indicatorHeight,
-            child: child!,
+            child: Stack(
+              children: [
+                Positioned.fill(child: widget.builder(context, _ac)),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: child!,
+                ),
+              ],
+            ),
           );
         },
-        child: Stack(
-          children: [
-            Positioned.fill(child: widget.builder(context, _ac)),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: _buildSlideIndicator(),
-            ),
-          ],
-        ),
+        child: _buildSlideIndicator(),
       ),
     );
   }

@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart';
 import 'package:walden/pages/goal_page.dart';
 import 'package:walden/pages/home_page.dart';
 import 'package:walden/pages/note_page.dart';
@@ -23,6 +25,7 @@ class MyApp extends StatelessWidget {
       statusBarColor: Colors.transparent,
       systemNavigationBarColor: Colors.transparent,
     ));
+    Intl.defaultLocale = "zh";
     return MaterialApp(
       title: 'Flutter Demo',
       scrollBehavior: CupertinoScrollBehavior(),
@@ -43,6 +46,15 @@ class MyApp extends StatelessWidget {
             selectedItemColor: Colors.black87,
             selectedLabelStyle: TextStyle(fontSize: 12),
           )),
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [
+        Locale('en'),
+        Locale('zh', 'CN'),
+      ],
       home: const NavigatorHomeScreen(),
     );
   }
