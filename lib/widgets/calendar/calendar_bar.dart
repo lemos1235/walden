@@ -71,7 +71,8 @@ class _CalendarBarState extends State<CalendarBar> {
         SlidingPanel(
           maxHeight: 400,
           builder: (BuildContext context, AnimationController ac) {
-            return Wrap(
+            return ListView(
+              physics: NeverScrollableScrollPhysics(),
               children: [
                 Padding(
                   padding: const EdgeInsets.only(left: 12, right: 12, top: 10, bottom: 0),
@@ -94,7 +95,7 @@ class _CalendarBarState extends State<CalendarBar> {
 
   List<Widget> getWeekDayNameUI() {
     final List<Widget> listUI = <Widget>[];
-    for (int i = 6; i < 13; i++) {
+    for (int i = 0; i < 7; i++) {
       listUI.add(
         Expanded(
           child: Center(
