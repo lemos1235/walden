@@ -69,10 +69,10 @@ class _CalendarBarState extends State<CalendarBar> {
           ),
         ),
         SlidingPanel(
-          maxHeight: 400,
+          maxHeight: 340,
           builder: (BuildContext context, AnimationController ac) {
-            return ListView(
-              physics: NeverScrollableScrollPhysics(),
+            return Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Padding(
                   padding: const EdgeInsets.only(left: 12, right: 12, top: 10, bottom: 0),

@@ -2,7 +2,6 @@
 // [Author] lg (https://github.com/lemos1235)
 // [Date] 2023/1/11
 //
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 typedef SlidingBodyBuilder = Widget Function(BuildContext context, AnimationController controller);
@@ -52,12 +51,21 @@ class _SlidingPanelState extends State<SlidingPanel> with SingleTickerProviderSt
       child: AnimatedBuilder(
         animation: _ac,
         builder: (BuildContext context, Widget? child) {
+          final currHeight = (widget.maxHeight - widget.minHeight) * _ac.value + widget.minHeight;
+          final deltaY = -(widget.maxHeight - currHeight) / 2;
           return Container(
-            height:
-                (widget.maxHeight - widget.minHeight) * _ac.value + widget.minHeight + widget.indicatorHeight,
+            height: currHeight + widget.indicatorHeight,
             child: Stack(
               children: [
-                Positioned.fill(child: widget.builder(context, _ac)),
+                Positioned(
+                  top: deltaY,
+                  left: 0,
+                  right: 0,
+                  child: Opacity(
+                    opacity: _ac.value,
+                    child: widget.builder(context, _ac),
+                  ),
+                ),
                 Positioned(
                   bottom: 0,
                   left: 0,
@@ -104,12 +112,12 @@ class _SlidingPanelState extends State<SlidingPanel> with SingleTickerProviderSt
 
   Widget _buildSlideIndicator() {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () {
         _ac.fling(velocity: 1 - 2 * _ac.value);
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
-        color: Colors.red,
         width: double.infinity,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -118,7 +126,7 @@ class _SlidingPanelState extends State<SlidingPanel> with SingleTickerProviderSt
               width: 30,
               height: 5,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: Colors.grey[500],
                 borderRadius: BorderRadius.all(Radius.circular(12.0)),
               ),
             ),
