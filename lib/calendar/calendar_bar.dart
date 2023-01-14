@@ -84,7 +84,7 @@ class _CalendarBarState extends State<CalendarBar> {
             ),
           ),
           SlidingPanel(
-            maxHeight: 340,
+            maxHeight: 39 + (MediaQuery.of(context).size.width - 40 )/7*6,
             builder: (BuildContext context, AnimationController ac) {
               return Column(
                 children: [
