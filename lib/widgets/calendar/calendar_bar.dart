@@ -14,17 +14,21 @@ class CalendarBar extends StatefulWidget {
 }
 
 class _CalendarBarState extends State<CalendarBar> {
-  List<DateTime> dateList = <DateTime>[];
-  DateTime currentMonthDate = DateTime.now();
+  late PageController _pc;
+
+  final int initialPage = 9999;
+
+  late ValueNotifier<int> _pageIndex;
 
   @override
   void initState() {
     super.initState();
-    setListOfDate(currentMonthDate);
+    _pageIndex = ValueNotifier(initialPage);
+    _pc = PageController(initialPage: initialPage);
   }
 
-  void setListOfDate(DateTime monthDate) {
-    dateList.clear();
+  List<DateTime> getListOfDate(DateTime monthDate) {
+    final dateList = <DateTime>[];
     //上个月的最后一天零点
     final DateTime newDate = DateTime(monthDate.year, monthDate.month, 0);
     int previousMothDay = 0;
@@ -41,6 +45,7 @@ class _CalendarBarState extends State<CalendarBar> {
     for (int i = 0; i < (42 - previousMothDay); i++) {
       dateList.add(newDate.add(Duration(days: i + 1)));
     }
+    return dateList;
   }
 
   @override
@@ -52,10 +57,7 @@ class _CalendarBarState extends State<CalendarBar> {
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: DefaultTextStyle(
             style: TextStyle(color: Colors.black45),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: getWeekDayNameUI(),
-            ),
+            child: getWeekDayNameUI(),
           ),
         ),
         Padding(
@@ -69,22 +71,47 @@ class _CalendarBarState extends State<CalendarBar> {
           ),
         ),
         SlidingPanel(
-          maxHeight: 340,
+          maxHeight: 378,
           builder: (BuildContext context, AnimationController ac) {
             return Column(
-              mainAxisSize: MainAxisSize.min,
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 12, right: 12, top: 10, bottom: 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      buildYearAndMonthPicker(),
-                      buildMonthNavigator(),
-                    ],
-                  ),
+                SizedBox(height: 10),
+                ValueListenableBuilder(
+                  valueListenable: _pageIndex,
+                  builder: (BuildContext context, int pageIndex, Widget? child) {
+                    final indexDate = calcIndexDate(pageIndex);
+                    print('pageIndex: $pageIndex');
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          buildYearAndMonthPicker(indexDate),
+                          buildMonthNavigator(pageIndex),
+                        ],
+                      ),
+                    );
+                  },
                 ),
-                ...getDaysNoUI(),
+                SizedBox(height: 5),
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pc,
+                    onPageChanged: (index) {
+                      _pageIndex.value = index;
+                    },
+                    itemBuilder: (BuildContext context, int index) {
+                      final indexDate = calcIndexDate(index);
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: getDaysNoUI(indexDate),
+                        ),
+                      );
+                    },
+                  ),
+                )
               ],
             );
           },
@@ -93,48 +120,35 @@ class _CalendarBarState extends State<CalendarBar> {
     );
   }
 
-  List<Widget> getWeekDayNameUI() {
-    final List<Widget> listUI = <Widget>[];
-    for (int i = 0; i < 7; i++) {
-      listUI.add(
-        Expanded(
-          child: Center(
-            child: Text(
-              DateFormat.E().format(dateList[i]).replaceAll("周", ""),
-              style:
-                  TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: ThemeData.light().primaryColor),
-            ),
-          ),
-        ),
-      );
-    }
-    return listUI;
+  DateTime calcIndexDate(int index) {
+    final interval = index - initialPage;
+    final currentDate = DateTime.now();
+    return DateTime(currentDate.year, currentDate.month + interval + 1, 0);
   }
 
-  Widget buildYearAndMonthPicker() {
-    var monthYear = DateFormat("MMM, yyyy").format(currentMonthDate);
+  Widget buildYearAndMonthPicker(DateTime indexDate) {
+    var monthYear = DateFormat("yyyy, MMMM").format(indexDate);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(
-          width: 80,
-          child: Text(
-            monthYear,
-            strutStyle: StrutStyle(
-              height: 1,
-              leading: 0.3,
-            ),
+        SizedBox(width: 12),
+        Text(
+          monthYear,
+          strutStyle: StrutStyle(
+            height: 1,
+            leading: 0.5,
           ),
         ),
         Icon(
-          Icons.navigate_next,
+          Icons.arrow_forward_ios,
           color: ThemeData.light().primaryColor,
+          size: 14,
         ),
       ],
     );
   }
 
-  Widget buildMonthNavigator() {
+  Widget buildMonthNavigator(int pageIndex) {
     return Theme(
       data: ThemeData(
         splashColor: Colors.transparent,
@@ -146,31 +160,27 @@ class _CalendarBarState extends State<CalendarBar> {
         children: [
           InkWell(
             onTap: () {
-              setState(() {
-                currentMonthDate = DateTime(currentMonthDate.year, currentMonthDate.month, 0);
-                setListOfDate(currentMonthDate);
-              });
+              _pc.animateToPage(pageIndex - 1, duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
             },
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
+              padding: EdgeInsets.only(left: 6, right: 8),
               child: Icon(
-                Icons.keyboard_arrow_left,
+                Icons.arrow_back_ios,
                 color: ThemeData.light().primaryColor,
+                size: 20,
               ),
             ),
           ),
           InkWell(
             onTap: () {
-              setState(() {
-                currentMonthDate = DateTime(currentMonthDate.year, currentMonthDate.month + 2, 0);
-                setListOfDate(currentMonthDate);
-              });
+              _pc.animateToPage(pageIndex + 1, duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
             },
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 10),
+              padding: EdgeInsets.only(left: 8, right: 6),
               child: Icon(
-                Icons.keyboard_arrow_right,
+                Icons.arrow_forward_ios,
                 color: ThemeData.light().primaryColor,
+                size: 20,
               ),
             ),
           ),
@@ -179,7 +189,16 @@ class _CalendarBarState extends State<CalendarBar> {
     );
   }
 
-  List<Widget> getDaysNoUI() {
+  Widget getWeekDayNameUI() {
+    final items = ["日", "一", "二", "三", "四", "五", "六"];
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [for (var e in items) Expanded(child: Center(child: Text(e)))],
+    );
+  }
+
+  List<Widget> getDaysNoUI(DateTime indexDate) {
+    List<DateTime> dateList = getListOfDate(indexDate);
     final List<Widget> noList = <Widget>[];
     int count = 0;
     //dateList.length 为 42，一行是 7 列，总共是 6 行。
@@ -218,7 +237,7 @@ class _CalendarBarState extends State<CalendarBar> {
                                   // 当天的高亮显示
                                   color: isToday
                                       ? ThemeData.light().primaryColor
-                                      : currentMonthDate.month == date.month
+                                      : indexDate.month == date.month
                                           ? Colors.black
                                           //不是当前月的，灰度显示
                                           : Colors.grey.withOpacity(0.6),

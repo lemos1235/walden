@@ -63,7 +63,10 @@ class _SlidingPanelState extends State<SlidingPanel> with SingleTickerProviderSt
                   right: 0,
                   child: Opacity(
                     opacity: _ac.value,
-                    child: widget.builder(context, _ac),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxHeight: widget.maxHeight),
+                      child: widget.builder(context, _ac),
+                    ),
                   ),
                 ),
                 Positioned(
