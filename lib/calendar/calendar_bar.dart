@@ -121,7 +121,7 @@ class _CalendarBarState extends State<CalendarBar> {
                 color: Color(0xffd3e9ef),
                 borderRadius: BorderRadius.circular(5),
               ),
-              height: (MediaQuery.of(context).size.width - 40) / 7,
+              height: (MediaQuery.of(context).size.width - 30) / 7,
               child: _buildWeekDaysBar(),
             ),
           ),
@@ -160,7 +160,6 @@ class _CalendarBarState extends State<CalendarBar> {
     );
   }
 
-
   /// 索引周日期选择
   Widget _buildWeekDaysBar() {
     return PageView.builder(
@@ -172,8 +171,8 @@ class _CalendarBarState extends State<CalendarBar> {
           DateTime date = firstDay.add(Duration(days: i));
           listUI.add(Expanded(
               child: _buildDayUI(date, true, onClick: () {
-                _slidingKey.currentState?.closePanel();
-              })));
+            _slidingKey.currentState?.closePanel();
+          })));
         }
         return Row(
           mainAxisAlignment: MainAxisAlignment.center,

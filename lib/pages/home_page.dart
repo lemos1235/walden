@@ -21,7 +21,7 @@ class _HomePageState extends State<HomePage> {
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 199.0),
+            padding: EdgeInsets.only(top: 106 + MediaQuery.of(context).padding.top + (MediaQuery.of(context).size.width - 30) / 7.0),
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
@@ -50,8 +50,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget buildAppBar() {
-    var mediaQuery = MediaQuery.of(context);
-    final statusBarHeight = mediaQuery.padding.top;
+    final statusBarHeight = MediaQuery.of(context).padding.top;
     final appBarLeading = Row(
       children: [
         SizedBox(width: 12),
