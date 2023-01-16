@@ -21,22 +21,30 @@ class SlidingPanel extends StatefulWidget {
   final double flingSpeed = 365;
 
   @override
-  State<SlidingPanel> createState() => _SlidingPanelState();
+  State<SlidingPanel> createState() => SlidingPanelState();
 }
 
-class _SlidingPanelState extends State<SlidingPanel> with SingleTickerProviderStateMixin {
+class SlidingPanelState extends State<SlidingPanel> with SingleTickerProviderStateMixin {
   late AnimationController _ac;
 
   @override
   void initState() {
     super.initState();
-    _ac = AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+    _ac = AnimationController(vsync: this, duration: Duration(milliseconds: 300));
   }
 
   @override
   void dispose() {
     _ac.dispose();
     super.dispose();
+  }
+
+  void openPanel() {
+    _ac.animateTo(1.0, duration: Duration(milliseconds: 300));
+  }
+
+  void closePanel() {
+    _ac.animateTo(0.0, duration: Duration(milliseconds: 300), curve: Curves.easeOut);
   }
 
   @override
@@ -117,7 +125,7 @@ class _SlidingPanelState extends State<SlidingPanel> with SingleTickerProviderSt
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        _ac.fling(velocity: 1 - 2 * _ac.value);
+        _ac.value == 0 ? openPanel() : closePanel();
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),

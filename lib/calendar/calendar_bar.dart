@@ -32,6 +32,8 @@ class _CalendarBarState extends State<CalendarBar> {
 
   CalendarMode _pickerMode = CalendarMode.date;
 
+  final GlobalKey<SlidingPanelState> _slidingKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -104,8 +106,13 @@ class _CalendarBarState extends State<CalendarBar> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: getWeekDayNameUI(),
+            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                for (var e in ["日", "一", "二", "三", "四", "五", "六"]) Expanded(child: Center(child: Text(e)))
+              ],
+            ),
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 15),
@@ -115,10 +122,11 @@ class _CalendarBarState extends State<CalendarBar> {
                 borderRadius: BorderRadius.circular(5),
               ),
               height: (MediaQuery.of(context).size.width - 40) / 7,
-              child: _buildWeeksPicker(),
+              child: _buildWeekDaysBar(),
             ),
           ),
           SlidingPanel(
+            key: _slidingKey,
             maxHeight: 39 + (MediaQuery.of(context).size.width - 40) / 7 * 6,
             builder: (BuildContext context, AnimationController ac) {
               return Column(
@@ -132,7 +140,7 @@ class _CalendarBarState extends State<CalendarBar> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            buildYearAndMonthSelector(pageIndex),
+                            buildYearAndMonthNavigator(pageIndex),
                             if (_pickerMode == CalendarMode.date) buildMonthNavigator(pageIndex),
                           ],
                         ),
@@ -152,45 +160,28 @@ class _CalendarBarState extends State<CalendarBar> {
     );
   }
 
-  Widget buildYearAndMonthSelector(int pageIndex) {
-    final indexDate = getDateByDeltaMonth(pageIndex);
-    var monthYear = DateFormat("MMM, yyyy").format(indexDate);
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () {
-        setState(() {
-          if (_pickerMode != CalendarMode.date) {
-            _pickerMode = CalendarMode.date;
-            _pc = PageController(initialPage: pageIndex);
-          } else {
-            _pickerMode = CalendarMode.yearAndMonth;
-          }
-        });
+
+  /// 索引周日期选择
+  Widget _buildWeekDaysBar() {
+    return PageView.builder(
+      controller: _weeksPc,
+      itemBuilder: (context, index) {
+        final firstDay = getWeeksFirstDay(index);
+        List<Widget> listUI = [];
+        for (var i = 0; i < 7; i++) {
+          DateTime date = firstDay.add(Duration(days: i));
+          listUI.add(Expanded(
+              child: _buildDayUI(date, true, onClick: () {
+                _slidingKey.currentState?.closePanel();
+              })));
+        }
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: listUI,
+        );
       },
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(width: 12),
-          Container(
-            child: Text(
-              monthYear,
-              style: TextStyle(fontWeight: FontWeight.bold),
-              strutStyle: StrutStyle(
-                height: 1,
-                leading: 0.5,
-              ),
-            ),
-          ),
-          SizedBox(width: 10),
-          Icon(
-            _pickerMode == CalendarMode.date
-                ? Icons.keyboard_arrow_right_rounded
-                : Icons.keyboard_arrow_down_rounded,
-            color: iconColor,
-            size: 24,
-          ),
-        ],
-      ),
     );
   }
 
@@ -252,34 +243,57 @@ class _CalendarBarState extends State<CalendarBar> {
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: getDaysNoUI(indexDate),
+            children: _buildDaysUI(indexDate),
           ),
         );
       },
     );
   }
 
-  ///当前周选择器
-  Widget _buildWeeksPicker() {
-    return PageView.builder(
-      controller: _weeksPc,
-      itemBuilder: (context, index) {
-        final firstDay = getWeeksFirstDay(index);
-        List<Widget> listUI = [];
-        for (var i =0; i < 7; i++) {
-          DateTime date = firstDay.add(Duration(days: i));
-          listUI.add(Expanded(child: _buildDayUI(date, true)));
-        }
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: listUI,
-        );
+  /// 索引年月切换
+  Widget buildYearAndMonthNavigator(int pageIndex) {
+    final indexDate = getDateByDeltaMonth(pageIndex);
+    var monthYear = DateFormat("MMM, yyyy").format(indexDate);
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        setState(() {
+          if (_pickerMode != CalendarMode.date) {
+            _pickerMode = CalendarMode.date;
+            _pc = PageController(initialPage: pageIndex);
+          } else {
+            _pickerMode = CalendarMode.yearAndMonth;
+          }
+        });
       },
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(width: 12),
+          Container(
+            child: Text(
+              monthYear,
+              style: TextStyle(fontWeight: FontWeight.bold),
+              strutStyle: StrutStyle(
+                height: 1,
+                leading: 0.5,
+              ),
+            ),
+          ),
+          SizedBox(width: 10),
+          Icon(
+            _pickerMode == CalendarMode.date
+                ? Icons.keyboard_arrow_right_rounded
+                : Icons.keyboard_arrow_down_rounded,
+            color: iconColor,
+            size: 24,
+          ),
+        ],
+      ),
     );
   }
 
+  /// 索引月份前后切换
   Widget buildMonthNavigator(int pageIndex) {
     return Theme(
       data: ThemeData(
@@ -323,18 +337,7 @@ class _CalendarBarState extends State<CalendarBar> {
     );
   }
 
-  Widget getWeekDayNameUI() {
-    final items = ["日", "一", "二", "三", "四", "五", "六"];
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 15),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [for (var e in items) Expanded(child: Center(child: Text(e)))],
-      ),
-    );
-  }
-
-  List<Widget> getDaysNoUI(DateTime indexDate) {
+  List<Widget> _buildDaysUI(DateTime indexDate) {
     List<DateTime> dateList = getListOfDate(indexDate);
     final List<Widget> noList = <Widget>[];
     int count = 0;
@@ -362,7 +365,7 @@ class _CalendarBarState extends State<CalendarBar> {
     return noList;
   }
 
-  Widget _buildDayUI(DateTime date, bool isInMonth ) {
+  Widget _buildDayUI(DateTime date, bool isInMonth, {VoidCallback? onClick}) {
     bool isToday = DateTime.now().day == date.day &&
         DateTime.now().month == date.month &&
         DateTime.now().year == date.year;
@@ -379,6 +382,7 @@ class _CalendarBarState extends State<CalendarBar> {
                 onTap: () {
                   setState(() {
                     _selectedDate = date;
+                    onClick?.call();
                   });
                 },
                 child: Padding(
@@ -397,11 +401,11 @@ class _CalendarBarState extends State<CalendarBar> {
                           color: isToday
                               ? iconColor
                               : isSelected
-                              ? Colors.white
-                              : isInMonth
-                              ? Colors.black
-                          //不是当前月的，灰度显示
-                              : Colors.grey.withOpacity(0.6),
+                                  ? Colors.white
+                                  : isInMonth
+                                      ? Colors.black
+                                      //不是当前月的，灰度显示
+                                      : Colors.grey.withOpacity(0.6),
                           fontSize: MediaQuery.of(context).size.width > 360 ? 18 : 16,
                         ),
                       ),
