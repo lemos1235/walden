@@ -4,7 +4,6 @@
 //
 import 'package:flutter/material.dart';
 import 'package:walden/calendar/calendar_bar.dart';
-import 'package:walden/widgets/size_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -19,38 +18,33 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: TestSizeWidget(
-        builder: (BuildContext context, Widget child, Size childSize) {
-          return Stack(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(top: childSize.height),
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  children: [
-                    Container(
-                      alignment: Alignment.center,
-                      height: 120,
-                      color: Colors.orange,
-                      child: Text("9999"),
-                    ),
-                  ],
+      body: Stack(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(top: 106 + MediaQuery.of(context).padding.top + (MediaQuery.of(context).size.width - 30) / 7.0),
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                Container(
+                  alignment: Alignment.center,
+                  height: 120,
+                  color: Colors.orange,
+                  child: Text("9999"),
                 ),
-              ),
-              child,
-            ],
-          );
-        },
-        child: Material(
-          elevation: 2,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              buildAppBar(),
-              CalendarBar(),
-            ],
+              ],
+            ),
           ),
-        ),
+          Material(
+            elevation: 2,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                buildAppBar(),
+                CalendarBar(),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

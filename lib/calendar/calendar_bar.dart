@@ -5,7 +5,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:walden/widgets/size_widget.dart';
 import 'package:walden/widgets/sliding_panel.dart';
 
 enum CalendarMode { yearAndMonth, date }
@@ -122,6 +121,7 @@ class _CalendarBarState extends State<CalendarBar> {
                 color: Color(0xffd3e9ef),
                 borderRadius: BorderRadius.circular(5),
               ),
+              height: (MediaQuery.of(context).size.width - 30) / 7,
               child: _buildWeekDaysBar(),
             ),
           ),
@@ -162,7 +162,8 @@ class _CalendarBarState extends State<CalendarBar> {
 
   /// 索引周日期选择
   Widget _buildWeekDaysBar() {
-    return TestSizeItemBuilderWidget(
+    return PageView.builder(
+      controller: _weeksPc,
       itemBuilder: (context, index) {
         final firstDay = getWeeksFirstDay(index);
         List<Widget> listUI = [];
@@ -178,15 +179,6 @@ class _CalendarBarState extends State<CalendarBar> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: listUI,
-        );
-      },
-      builder: (BuildContext context, IndexedWidgetBuilder itemBuilder, Size itemSize) {
-        return SizedBox.fromSize(
-          size: itemSize,
-          child: PageView.builder(
-            controller: _weeksPc,
-            itemBuilder: itemBuilder,
-          ),
         );
       },
     );
