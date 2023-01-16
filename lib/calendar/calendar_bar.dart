@@ -25,6 +25,8 @@ class _CalendarBarState extends State<CalendarBar> {
 
   late PageController _pc;
 
+  late PageController _weeksPc;
+
   //当前选中的日期
   DateTime? _selectedDate;
 
@@ -36,6 +38,8 @@ class _CalendarBarState extends State<CalendarBar> {
     final datePageIndex = getMonthDelta(DateTime.now());
     _pageIndex = ValueNotifier(datePageIndex);
     _pc = PageController(initialPage: datePageIndex);
+    final weeksPageIndex = getWeeksDelta(DateTime.now());
+    _weeksPc = PageController(initialPage: weeksPageIndex);
   }
 
   List<DateTime> getListOfDate(DateTime monthDate) {
@@ -59,6 +63,36 @@ class _CalendarBarState extends State<CalendarBar> {
     return dateList;
   }
 
+  DateTime getDateByDeltaMonth(int deltaMonths) {
+    return DateUtils.addMonthsToMonthDate(startDate, deltaMonths);
+  }
+
+  int getMonthDelta(DateTime dateTime) {
+    DateTime dateTimeZero = DateTime(dateTime.year, dateTime.month + 1, 0);
+    return DateUtils.monthDelta(startDate, dateTimeZero);
+  }
+
+  int getWeeksDelta(DateTime dateTime) {
+    final diffDays = dateTime.difference(startDate).inDays;
+    if (startDate.weekday == 7) {
+      return (diffDays / 7).floor();
+    } else {
+      if (diffDays < (7 - startDate.weekday)) {
+        return 0;
+      } else {
+        return ((diffDays - (7 - startDate.weekday)) / 7).floor() + 1;
+      }
+    }
+  }
+
+  DateTime getWeeksFirstDay(int deltaWeeks) {
+    if (startDate.weekday == 7) {
+      return startDate.add(Duration(days: deltaWeeks * 7));
+    } else {
+      return startDate.add(Duration(days: deltaWeeks * 7 - startDate.weekday));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -74,17 +108,18 @@ class _CalendarBarState extends State<CalendarBar> {
             child: getWeekDayNameUI(),
           ),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12),
+            padding: EdgeInsets.symmetric(horizontal: 15),
             child: Container(
               decoration: BoxDecoration(
-                color: Color(0xFFb6d7e3),
+                color: Color(0xffd3e9ef),
                 borderRadius: BorderRadius.circular(5),
               ),
-              height: 48,
+              height: (MediaQuery.of(context).size.width - 40) / 7,
+              child: _buildWeeksPicker(),
             ),
           ),
           SlidingPanel(
-            maxHeight: 39 + (MediaQuery.of(context).size.width - 40 )/7*6,
+            maxHeight: 39 + (MediaQuery.of(context).size.width - 40) / 7 * 6,
             builder: (BuildContext context, AnimationController ac) {
               return Column(
                 children: [
@@ -115,15 +150,6 @@ class _CalendarBarState extends State<CalendarBar> {
         ],
       ),
     );
-  }
-
-  DateTime getDateByDeltaMonth(int deltaMonth) {
-    return DateUtils.addMonthsToMonthDate(startDate, deltaMonth);
-  }
-
-  int getMonthDelta(DateTime dateTime) {
-    DateTime dateTimeZero = DateTime(dateTime.year, dateTime.month + 1, 0);
-    return DateUtils.monthDelta(startDate, dateTimeZero);
   }
 
   Widget buildYearAndMonthSelector(int pageIndex) {
@@ -233,6 +259,27 @@ class _CalendarBarState extends State<CalendarBar> {
     );
   }
 
+  ///当前周选择器
+  Widget _buildWeeksPicker() {
+    return PageView.builder(
+      controller: _weeksPc,
+      itemBuilder: (context, index) {
+        final firstDay = getWeeksFirstDay(index);
+        List<Widget> listUI = [];
+        for (var i =0; i < 7; i++) {
+          DateTime date = firstDay.add(Duration(days: i));
+          listUI.add(Expanded(child: _buildDayUI(date, true)));
+        }
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: listUI,
+        );
+      },
+    );
+  }
+
   Widget buildMonthNavigator(int pageIndex) {
     return Theme(
       data: ThemeData(
@@ -278,9 +325,12 @@ class _CalendarBarState extends State<CalendarBar> {
 
   Widget getWeekDayNameUI() {
     final items = ["日", "一", "二", "三", "四", "五", "六"];
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [for (var e in items) Expanded(child: Center(child: Text(e)))],
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [for (var e in items) Expanded(child: Center(child: Text(e)))],
+      ),
     );
   }
 
@@ -294,76 +344,10 @@ class _CalendarBarState extends State<CalendarBar> {
       final List<Widget> listUI = <Widget>[];
       for (int i = 0; i < 7; i++) {
         final DateTime date = dateList[count];
-        bool isToday = DateTime.now().day == date.day &&
-            DateTime.now().month == date.month &&
-            DateTime.now().year == date.year;
-        bool isSelected = date == _selectedDate;
+        bool isInMonth = indexDate.month == date.month;
         listUI.add(
           Expanded(
-            child: AspectRatio(
-              aspectRatio: 1.0,
-              child: Container(
-                child: Stack(
-                  children: <Widget>[
-                    // 当前行的所有日期
-                    Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          setState(() {
-                            _selectedDate = date;
-                          });
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: const BorderRadius.all(Radius.circular(6)),
-                              color: isSelected ? Colors.black : Colors.transparent,
-                            ),
-                            child: Center(
-                              child: Text(
-                                '${date.day}',
-                                style: TextStyle(
-                                  fontWeight: isToday ? FontWeight.bold : FontWeight.w500,
-                                  // 当天的高亮显示
-                                  color: isToday
-                                      ? iconColor
-                                      : isSelected
-                                          ? Colors.white
-                                          : indexDate.month == date.month
-                                              ? Colors.black
-                                              //不是当前月的，灰度显示
-                                              : Colors.grey.withOpacity(0.6),
-                                  fontSize: MediaQuery.of(context).size.width > 360 ? 18 : 16,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    // 当前日期底部的高亮点
-                    // Positioned(
-                    //   bottom: 9,
-                    //   right: 0,
-                    //   left: 0,
-                    //   child: Container(
-                    //     height: 6,
-                    //     width: 6,
-                    //     decoration: BoxDecoration(
-                    //         color: DateTime.now().day == date.day &&
-                    //                 DateTime.now().month == date.month &&
-                    //                 DateTime.now().year == date.year
-                    //             ? themeColor
-                    //             : Colors.transparent,
-                    //         shape: BoxShape.circle),
-                    //   ),
-                    // ),
-                  ],
-                ),
-              ),
-            ),
+            child: _buildDayUI(date, isInMonth),
           ),
         );
         count += 1;
@@ -376,5 +360,76 @@ class _CalendarBarState extends State<CalendarBar> {
       ));
     }
     return noList;
+  }
+
+  Widget _buildDayUI(DateTime date, bool isInMonth ) {
+    bool isToday = DateTime.now().day == date.day &&
+        DateTime.now().month == date.month &&
+        DateTime.now().year == date.year;
+    bool isSelected = date == _selectedDate;
+    return AspectRatio(
+      aspectRatio: 1.0,
+      child: Container(
+        child: Stack(
+          children: <Widget>[
+            // 当前行的所有日期
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  setState(() {
+                    _selectedDate = date;
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(Radius.circular(6)),
+                      color: isSelected ? Colors.black : Colors.transparent,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${date.day}',
+                        style: TextStyle(
+                          fontWeight: isToday ? FontWeight.bold : FontWeight.w500,
+                          // 当天的高亮显示
+                          color: isToday
+                              ? iconColor
+                              : isSelected
+                              ? Colors.white
+                              : isInMonth
+                              ? Colors.black
+                          //不是当前月的，灰度显示
+                              : Colors.grey.withOpacity(0.6),
+                          fontSize: MediaQuery.of(context).size.width > 360 ? 18 : 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            // 当前日期底部的高亮点
+            // Positioned(
+            //   bottom: 9,
+            //   right: 0,
+            //   left: 0,
+            //   child: Container(
+            //     height: 6,
+            //     width: 6,
+            //     decoration: BoxDecoration(
+            //         color: DateTime.now().day == date.day &&
+            //                 DateTime.now().month == date.month &&
+            //                 DateTime.now().year == date.year
+            //             ? themeColor
+            //             : Colors.transparent,
+            //         shape: BoxShape.circle),
+            //   ),
+            // ),
+          ],
+        ),
+      ),
+    );
   }
 }
