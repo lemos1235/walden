@@ -4,10 +4,17 @@
 //
 import 'package:flutter/material.dart';
 
+const double kIndicatorHeight = 26.0;
+
+const double kFlingSpeed = 365.0;
+
+const double kSlidingDefaultMaxHeight = 200.0;
+
 typedef SlidingBodyBuilder = Widget Function(BuildContext context, AnimationController controller);
 
 class SlidingPanel extends StatefulWidget {
-  const SlidingPanel({Key? key, this.maxHeight = 200, this.minHeight = 0, required this.builder})
+  const SlidingPanel(
+      {Key? key, this.maxHeight = kSlidingDefaultMaxHeight, this.minHeight = 0, required this.builder})
       : super(key: key);
 
   final SlidingBodyBuilder builder;
@@ -16,9 +23,9 @@ class SlidingPanel extends StatefulWidget {
 
   final double minHeight;
 
-  final double indicatorHeight = 26;
+  final double indicatorHeight = kIndicatorHeight;
 
-  final double flingSpeed = 365;
+  final double flingSpeed = kFlingSpeed;
 
   @override
   State<SlidingPanel> createState() => SlidingPanelState();

@@ -106,22 +106,26 @@ class _CalendarBarState extends State<CalendarBar> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                for (var e in ["日", "一", "二", "三", "四", "五", "六"]) Expanded(child: Center(child: Text(e)))
-              ],
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Container(
+              height: 36,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  for (var e in ["日", "一", "二", "三", "四", "五", "六"]) Expanded(child: Center(child: Text(e)))
+                ],
+              ),
             ),
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 15),
             child: Container(
+              height: (MediaQuery.of(context).size.width - 30) / 7,
               decoration: BoxDecoration(
                 color: Color(0xffd3e9ef),
                 borderRadius: BorderRadius.circular(5),
               ),
-              height: (MediaQuery.of(context).size.width - 30) / 7,
               child: _buildWeekDaysBar(),
             ),
           ),

@@ -4,6 +4,7 @@
 //
 import 'package:flutter/material.dart';
 import 'package:walden/calendar/calendar_bar.dart';
+import 'package:walden/widgets/sliding_panel.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,10 +19,11 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: buildAppBar(),
       body: Stack(
         children: [
           Padding(
-            padding: EdgeInsets.only(top: 106 + MediaQuery.of(context).padding.top + (MediaQuery.of(context).size.width - 30) / 7.0),
+            padding: EdgeInsets.only(top: 36 + (MediaQuery.of(context).size.width - 30) / 7 + kIndicatorHeight + 1),
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
@@ -36,20 +38,14 @@ class _HomePageState extends State<HomePage> {
           ),
           Material(
             elevation: 2,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                buildAppBar(),
-                CalendarBar(),
-              ],
-            ),
+            child: CalendarBar(),
           ),
         ],
       ),
     );
   }
 
-  Widget buildAppBar() {
+  AppBar buildAppBar() {
     final statusBarHeight = MediaQuery.of(context).padding.top;
     final appBarLeading = Row(
       children: [
@@ -69,18 +65,14 @@ class _HomePageState extends State<HomePage> {
         ),
       ],
     );
-    return Padding(
-      padding: EdgeInsets.only(top: statusBarHeight),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          appBarLeading,
-          Padding(
-            padding: EdgeInsets.only(right: statusBarHeight / 2),
-            child: Icon(Icons.settings),
-          ),
-        ],
-      ),
+    return AppBar(
+      elevation: 0,
+      leadingWidth: 100,
+      leading: appBarLeading,
+      actions: [
+        Icon(Icons.settings),
+        SizedBox(width: statusBarHeight/2),
+      ],
     );
   }
 }
