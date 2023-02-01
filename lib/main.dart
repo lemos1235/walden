@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
-import 'package:walden/pages/goal_page.dart';
-import 'package:walden/pages/home_page.dart';
-import 'package:walden/pages/note_page.dart';
-import 'package:walden/pages/task_page.dart';
+import 'package:walden/goal/goal_page.dart';
+import 'package:walden/home/home_page.dart';
+import 'package:walden/note/note_page.dart';
+import 'package:walden/task/task_page.dart';
 
 void main() {
   runApp(const MyApp());

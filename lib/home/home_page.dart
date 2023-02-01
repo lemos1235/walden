@@ -3,7 +3,7 @@
 // [Date] 2023/1/10
 //
 import 'package:flutter/material.dart';
-import 'package:walden/calendar/calendar_bar.dart';
+import 'package:walden/home/widgets/calendar_bar.dart';
 import 'package:walden/widgets/sliding_panel.dart';
 
 class HomePage extends StatefulWidget {
@@ -23,7 +23,8 @@ class _HomePageState extends State<HomePage> {
       body: Stack(
         children: [
           Padding(
-            padding: EdgeInsets.only(top: 36 + (MediaQuery.of(context).size.width - 30) / 7 + kIndicatorHeight + 1),
+            padding: EdgeInsets.only(
+                top: 36 + (MediaQuery.of(context).size.width - 30) / 7 + kIndicatorHeight + 1),
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
@@ -71,7 +72,7 @@ class _HomePageState extends State<HomePage> {
       leading: appBarLeading,
       actions: [
         Icon(Icons.settings),
-        SizedBox(width: statusBarHeight/2),
+        SizedBox(width: statusBarHeight / 2),
       ],
     );
   }
